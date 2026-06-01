@@ -16,6 +16,10 @@
   #controls h1 { font-size: 15px; margin: 0 0 8px; }
   #controls select { width: 100%; padding: 6px; font-size: 13px; }
   #controls .note { font-size: 11px; color: #555; margin-top: 8px; line-height: 1.4; }
+  #controls details { margin-top: 8px; font-size: 11px; }
+  #controls summary { cursor: pointer; color: #15803d; font-weight: 600; }
+  #controls .bd p { margin: 6px 0 0; line-height: 1.5; color: #333; }
+  #controls .bd-note { color: #666; }
   #info { position: absolute; top: 12px; right: 12px; z-index: 1000; width: 230px; font-size: 13px; }
   #info h2 { font-size: 14px; margin: 0 0 6px; }
   #info table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -38,6 +42,24 @@
   <select id="metric"></select>
   <div class="note" id="metricNote"></div>
   <div class="note">指数は 0.00〜1.00（1.00で男女均等）。色が濃いほど均等。地図をホバーで詳細表示。</div>
+  <details id="breakdown">
+    <summary>4指標版・8指標版の内訳を見る</summary>
+    <div class="bd">
+      <p><b>4指標版（基本4指標）</b><br>
+        ① 議会の女性議員比率〔政治〕<br>
+        ② 女性管理職比率〔行政〕<br>
+        ③ 審議会委員の女性比率〔行政〕<br>
+        ④ 男性職員の育休取得率〔経済〕</p>
+      <p><b>8指標版（基本4＋追加4）</b><br>
+        上記①〜④ に加えて<br>
+        ⑤ 首長・副首長の女性〔政治〕<br>
+        ⑥ 防災会議の女性比率〔行政〕<br>
+        ⑦ 自治会長の女性比率〔地域〕<br>
+        ⑧ 給与の男女差異〔経済〕</p>
+      <p class="bd-note">〔 〕は分野。総合スコアは「分野内を逆標準偏差で加重平均 → 分野間を均等平均」。
+        4指標版は政治・行政・経済の3分野、8指標版は地域を加えた4分野。</p>
+    </div>
+  </details>
 </div>
 
 <div id="info" class="panel">
@@ -175,7 +197,9 @@ for(const g of Object.keys(groups)){
   sel.appendChild(og);
 }
 const NOTES = {
-  '差分(8指標版-4指標版)': '青=8指標版が高い / 赤=低い（0が中心）。',
+  '4指標版総合スコア': '基本4指標＝①議員・②管理職・③審議会・④男性育休（政治/行政/経済）。',
+  '8指標版総合スコア': '8指標＝基本4＋⑤首長・⑥防災・⑦自治会長・⑧給与（政治/行政/地域/経済）。',
+  '差分(8指標版-4指標版)': '青=8指標版が高い / 赤=低い（0が中心）。指標を増やした影響を表す。',
   '⑧給与': '女性活躍推進法の未公表5町は「データなし」。',
   '⑦自治会長': '全自治体で女性比率が極端に低く、分散が小さい指標。',
 };
