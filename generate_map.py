@@ -142,18 +142,30 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   #controls summary { cursor: pointer; color: #15803d; font-weight: 600; }
   #controls .bd p { margin: 6px 0 0; line-height: 1.5; color: #333; }
   #controls .bd-note { color: #666; }
-  #info { position: absolute; top: 12px; right: 12px; z-index: 1000; width: 230px; font-size: 13px; }
-  #info h2 { font-size: 14px; margin: 0 0 6px; }
+  #info { position: absolute; top: 12px; right: 12px; z-index: 1100; width: 230px; font-size: 13px;
+          max-height: calc(100vh - 24px); overflow-y: auto; }
+  #info.hidden { display: none; }
+  #info h2 { font-size: 14px; margin: 0 24px 6px 0; }
   #info table { width: 100%; border-collapse: collapse; font-size: 12px; }
   #info td { padding: 1px 2px; }
   #info td.v { text-align: right; font-variant-numeric: tabular-nums; }
   #info .big { font-size: 20px; font-weight: bold; }
+  #infoClose { position: absolute; top: 6px; right: 8px; width: 28px; height: 28px; padding: 0;
+               border: none; background: none; cursor: pointer; font-size: 22px; line-height: 1;
+               color: #555; }
+  #infoClose:hover { color: #000; }
   .legend { position: absolute; bottom: 18px; left: 12px; z-index: 1000; font-size: 12px; }
   .legend .bar { height: 12px; width: 220px; border: 1px solid #999; border-radius: 2px; }
   .legend .ticks { display: flex; justify-content: space-between; width: 222px; margin-top: 2px; }
   .legend .na { margin-top: 6px; color: #555; }
   .legend .na i { display: inline-block; width: 12px; height: 12px; background: #e8e8e8;
                   border: 1px solid #999; vertical-align: -2px; margin-right: 4px; }
+  /* スマホ等の狭い画面：infoを下部シート化し、高さを抑えてスクロール＆閉じられるように */
+  @media (max-width: 640px) {
+    #controls { max-width: calc(100vw - 24px); }
+    #info { top: auto; bottom: 12px; left: 12px; right: 12px; width: auto;
+            max-height: 45vh; }
+  }
 </style>
 </head>
 <body>
@@ -184,7 +196,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   </details>
 </div>
 
-<div id="info" class="panel">
+<div id="info" class="panel hidden">
+  <button id="infoClose" type="button" aria-label="閉じる" title="閉じる">×</button>
   <h2 id="infoName">自治体を選択</h2>
   <div><span class="big" id="infoVal">—</span> <span id="infoLabel" style="font-size:12px;color:#555"></span></div>
   <table id="infoTable"></table>
@@ -272,6 +285,7 @@ map.fitBounds(geoLayer.getBounds(), { padding: [20,20] });
 
 function showInfo(code){
   const d = DATA[code] || {};
+  document.getElementById('info').classList.remove('hidden');
   document.getElementById('infoName').textContent = NAMES[code];
   const m = metricByKey(current);
   document.getElementById('infoVal').textContent = fmt(d[current]);
@@ -300,11 +314,19 @@ function updateMap(){
   geoLayer.setStyle(styleFn);
   geoLayer.eachLayer(l => l.setTooltipContent(tooltipHTML(l.feature.properties.code)));
   updateLegend();
-  // info欄の選択中metric表示を更新（自治体選択済みなら維持）
-  const cur = document.getElementById('infoName').textContent;
-  const code = Object.keys(NAMES).find(c=>NAMES[c]===cur);
-  if(code) showInfo(code);
+  // info欄の選択中metric表示を更新（パネル表示中のみ＝閉じている時は出し直さない）
+  const info = document.getElementById('info');
+  if(!info.classList.contains('hidden')){
+    const cur = document.getElementById('infoName').textContent;
+    const code = Object.keys(NAMES).find(c=>NAMES[c]===cur);
+    if(code) showInfo(code);
+  }
 }
+
+// infoパネルを閉じる（スマホでポップアップを消せるように）
+document.getElementById('infoClose').addEventListener('click', () => {
+  document.getElementById('info').classList.add('hidden');
+});
 
 // プルダウン構築（group別optgroup）
 const sel = document.getElementById('metric');
