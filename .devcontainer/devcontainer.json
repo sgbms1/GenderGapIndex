@@ -1,0 +1,22 @@
+{
+    "name": "市町村版ジェンダーギャップ指数 開発環境",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "lts"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-toolsai.jupyter"
+            ]
+        }
+    },
+    "postCreateCommand": "npm install -g @anthropic-ai/claude-code",
+    "remoteUser": "vscode"
+}
